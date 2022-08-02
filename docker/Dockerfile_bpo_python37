@@ -1,0 +1,30 @@
+FROM ubuntu:20.04
+
+# docker run -it --rm -v $(realpath ../BluePyOpt):/root/BluePyOpt bluepyopt-3.7:base
+# cd root && source venv/bin/activate && cd BluePyOpt && pip install -e . && tox
+# cd /root/BluePyOpt && pip install -e . && tox
+
+RUN apt-get update \
+  && env DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich \
+  apt-get -y install --no-install-recommends \
+    build-essential \
+    locales \
+    less \
+    tree \
+    vim \
+    rsync \
+    curl \
+    git \
+    wget \
+    software-properties-common \
+  && locale-gen en_US.UTF-8 \
+  && add-apt-repository -y ppa:deadsnakes/ppa \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends python3.7 python3.7-venv python3.7-dev \
+  && rm -rf /var/lib/apt/lists/*
+
+ENV LANG C.UTF-8
+
+RUN cd root && python3.7 -m venv venv && . venv/bin/activate && pip install --upgrade pip && pip install pytest tox
+
+CMD cd root && . venv/bin/activate && cd BluePyOpt && pip install -e . && tox

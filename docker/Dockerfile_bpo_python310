@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 # docker run -it --rm -v $(realpath ../BluePyOpt):/root/BluePyOpt bluepyopt-3.10:base
 # cd root && source venv/bin/activate && cd BluePyOpt && pip install -e . && tox
@@ -16,15 +16,16 @@ RUN apt-get update \
     curl \
     git \
     wget \
+    gpg-agent \
     software-properties-common \
   && locale-gen en_US.UTF-8 \
   && add-apt-repository -y ppa:deadsnakes/ppa \
   && apt-get update \
-  && apt-get install -y --no-install-recommends python3.10 python3.10-venv python3.10-dev \
+  && env DEBIAN_FRONTEND=noninteractive TZ=Europe/Zurich apt-get install -y --no-install-recommends python3.10 python3.10-venv python3.10-dev default-jre \
   && rm -rf /var/lib/apt/lists/*
 
 ENV LANG C.UTF-8
 
 RUN cd root && python3.10 -m venv venv && . venv/bin/activate && pip install --upgrade pip && pip install pytest tox
 
-CMD cd root && . venv/bin/activate && cd BluePyOpt && pip install -e . && tox
+CMD cd root && . venv/bin/activate && cd BluePyOpt && pip install -e . && pip install pyneuroml libNeuroML LFPy && tox
